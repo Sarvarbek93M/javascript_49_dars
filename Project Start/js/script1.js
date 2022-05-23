@@ -1,17 +1,17 @@
 window.addEventListener("DOMContentLoaded", () => {
+  // LOADER
   const loader = document.querySelector(".loader");
   setTimeout(function () {
-    loader.style.apacity = "0";
+    loader.style.opacity = 0;
     setTimeout(function () {
       loader.style.display = "none";
     }, 1500);
   }, 2000);
 
-  //-------------- TABS
-
+  // TABS
   const tabs = document.querySelectorAll(".tabheader__item"),
     tabContent = document.querySelectorAll(".tabcontent"),
-    tabParent = document.querySelector(".tabheader__items");
+    headerParents = document.querySelector(".tabheader__items");
 
   function hideTabContent() {
     tabContent.forEach((item) => {
@@ -21,16 +21,18 @@ window.addEventListener("DOMContentLoaded", () => {
       item.classList.remove("tabheader__item_active");
     });
   }
+
   function showTabContent(i = 0) {
     tabContent[i].style.display = "block";
     tabs[i].classList.add("tabheader__item_active");
   }
+
   hideTabContent();
   showTabContent();
 
-  tabParent.addEventListener("click", (event) => {
+  headerParents.addEventListener("click", (event) => {
+    console.log(event);
     const target = event.target;
-    console.log(1);
     if (target && target.classList.contains("tabheader__item")) {
       tabs.forEach((item, i) => {
         if (target == item) {
@@ -40,57 +42,59 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
-  //-----MODAL
 
-  const modalBtn = document.querySelectorAll(".btnmodal"),
+  // MODAL
+  const allModalBtn = document.querySelectorAll("[data-modal]"),
     modal = document.querySelector(".modal"),
-    modalClose = document.querySelector("[date-close]");
+    modalClose = document.querySelector("[data-close]");
 
-  modalBtn.forEach((btn) => {
-    btn.addEventListener("click", showModal);
+  allModalBtn.forEach((btn) => {
+    btn.addEventListener("click", openModal);
   });
 
-  function showModal() {
+  function openModal() {
     modal.classList.add("show");
-    modal.classList.remove("none");
+    modal.classList.remove("hide");
     document.body.style.overflow = "hidden";
     clearInterval(modalTimer);
   }
-  function hideModal() {
-    modal.classList.add("none");
+
+  function closeModal() {
+    modal.classList.add("hide");
     modal.classList.remove("show");
     document.body.style.overflow = "";
   }
-  modalClose.addEventListener("click", hideModal);
+
+  modalClose.addEventListener("click", closeModal);
 
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
-      hideModal();
+      closeModal();
     }
   });
-  //const modalTimer = setTimeout(showModal, 10000);
+
+  // const modalTimer = setTimeout(openModal, 5000);
+
   function showMyModalByScroll() {
     if (
       window.pageYOffset + document.documentElement.clientHeight >=
       document.documentElement.scrollHeight
     ) {
-      showModal();
+      openModal();
       window.removeEventListener("scroll", showMyModalByScroll);
     }
   }
   window.addEventListener("scroll", showMyModalByScroll);
 
-  //--------- DATE
-
-  const deadline = "2022-05-25";
+  // DATA
+  const deadline = "2021-08-11";
 
   function getTime(endtime) {
     const total = Date.parse(endtime) - Date.parse(new Date()),
       days = Math.floor(total / (1000 * 60 * 60 * 24)),
-      hours = Math.floor(((total / 1000) * 60 * 60) % 24),
-      minutes = Math.floor((total / 1000 / 10) % 60),
-      seconds = Math.floor((total / 1000) % 60);
-
+      seconds = Math.floor((total / 1000) % 60),
+      minutes = Math.floor((total / 1000 / 60) % 60),
+      hours = Math.floor((total / (1000 * 60 * 60)) % 24);
     return {
       total: total,
       days: days,
@@ -101,7 +105,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function getZero(num) {
-    if ((num >= 0, num < 10)) {
+    if (num >= 0 && num < 10) {
       return "0" + num;
     } else {
       return num;
@@ -114,11 +118,11 @@ window.addEventListener("DOMContentLoaded", () => {
       hours = timer.querySelector("#hours"),
       minutes = timer.querySelector("#minutes"),
       seconds = timer.querySelector("#seconds"),
-      timeInterval = setInterval(updeteTime, 1000);
+      timeInterval = setInterval(updateClock, 1000);
 
-    updeteTime();
+    updateClock();
 
-    function updeteTime() {
+    function updateClock() {
       const time = getTime(endtime);
       days.innerHTML = getZero(time.days);
       hours.innerHTML = getZero(time.hours);
@@ -129,134 +133,125 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
   }
-
   setClock(".timer", deadline);
 
-  //--------class
-
+  // CLASS
   class CarCard {
-    constructor(src, alt, title, price, descr, parentSelector, ...classess) {
+    constructor(src, alt, title, descr, price, parentSelector, ...classess) {
       this.src = src;
-      this.title = title;
       this.alt = alt;
-      this.price = price;
+      this.title = title;
       this.descr = descr;
+      this.price = price;
       this.classess = classess;
       this.parent = document.querySelector(parentSelector);
-      this.transwer = "11100";
+      this.transfer = 10;
       this.changeToUSD();
     }
+
     changeToUSD() {
-      this.price = this.price * this.transwer;
+      this.price = this.price * this.transfer;
     }
 
     render() {
       const element = document.createElement("div");
-      if (this.classess.length === 0) {
-        this.classess = "menu__item";
-        element.classList.add(this.classess);
-      } else {
-        this.classess.forEach((className) => element.classList.add(className));
-      }
+      // if(this.classess.length === 0) {
+      //   this.classess = 'menu__item'
+      //   element.classList.add(this.classess)
+      // }else{
+      //   this.classess.forEach(className => element.classList.add(className))
+      // }
       element.innerHTML = `
         <div class="menu__item">
-              <img src=${this.src} alt=${this.alt} />
-              <h3 class="menu__item-subtitle">${this.title}</h3>
-              <div class="menu__item-descr">${this.descr}</div>
-              <div class="menu__item-divider"></div>
-              <div class="menu__item-price">
-                <div class="menu__item-cost">Price:</div>
-                <div class="menu__item-total"><span>${this.price}</span> sum</div>
-              </div>
-            </div>
-        `;
+          <img src=${this.src} alt=${this.alt} />
+          <h3 class="menu__item-subtitle">${this.title}</h3>
+          <div class="menu__item-descr">${this.descr}</div>
+          <div class="menu__item-divider"></div>
+          <div class="menu__item-price">
+            <div class="menu__item-cost">Price:</div>
+            <div class="menu__item-total"><span>${this.price}</span> $</div>
+          </div>
+        </div>
+      `;
       this.parent.append(element);
     }
   }
-
   new CarCard(
-    "../img/tabs/1.jpg",
-    "vegy",
+    "img/tabs/1.jpg",
+    "car",
     "2021 Mercedes-Benz C-Class",
-    299,
-    `The 2021 Mercedes-Benz C-Class finishes in the top half of ou luxury small car rankings 
-     It is powerful and upscale but it has so/so handli`,
+    `The 2021 Mercedes-Benz C-Class finishes in the top half of our
+    luxury small car rankings. It's powerful and upscale, but it has
+    so-so handli...`,
+    100,
+    ".menu .container"
+    // 'red',
+    // 'black'
+  ).render();
+  new CarCard(
+    "img/tabs/2.jpg",
+    "car",
+    "2021 Mercedes-Benz CLA-Class",
+    `The 2021 Mercedes-Benz C-Class finishes in the top half of our
+    luxury small car rankings. It's powerful and upscale, but it has
+    so-so handli...`,
+    100,
+    ".menu .container"
+  ).render();
+  new CarCard(
+    "img/tabs/3.jpg",
+    "car",
+    "2021 Mercedes-Benz SCLA",
+    `The 2021 Mercedes-Benz C-Class finishes in the top half of our
+    luxury small car rankings. It's powerful and upscale, but it has
+    so-so handli...`,
+    100,
     ".menu .container"
   ).render();
 
-  new CarCard(
-    "../img/tabs/1.jpg",
-    "vegy",
-    "2021 Mercedes-Benz C-Class",
-    299,
-    `The 2021 Mercedes-Benz C-Class finishes in the top half of ou luxury small car rankings
-      It is powerful and upscale but it has so/so handli`,
-    ".menu .container"
-  ).render();
-
-  new CarCard(
-    "../img/tabs/1.jpg",
-    "vegy",
-    "2021 Mercedes-Benz C-Class",
-    299,
-    `The 2021 Mercedes-Benz C-Class finishes in the top half of ou luxury small car rankings  
-    It is powerful and upscale but it has so/so handli`,
-    ".menu .container"
-  ).render();
-
-  //---------SLIDER first way
-
-  // const slides = document.querySelectorAll(".offer__slide"),
-  //   prev = document.querySelector(".offer__slider-prev"),
-  //   next = document.querySelector(".offer__slider-next"),
-  //   current = document.querySelector("#current"),
-  //   total = document.querySelector("#total");
+  // SLIDER FIRST WAY (EASY)
+  // const slides = document.querySelectorAll('.offer__slide'),
+  //   prev = document.querySelector('.offer__slider-prev'),
+  //   next = document.querySelector('.offer__slider-next'),
+  //   current = document.querySelector('#current'),
+  //   total = document.querySelector('#total');
 
   // let slideIndex = 1;
-
-  // show(slideIndex);
-
+  // show(slideIndex)
   // function show(s) {
-  //   if (s > slides.length) {
-  //     slideIndex = 1;
-  //     if (s < 1) {
-  //       slideIndex = slides.length;
-  //     }
+  //   if(s > slides.length){
+  //     slideIndex = 1
   //   }
-  //   slides.forEach((item) => (item.style.cssText = "display: none"));
-  //   slides[slideIndex - 1].style.display = "block";
-  //   if (slides.length < 10) {
-  //     current.textContent = `0${slideIndex}`;
-  //   } else {
-  //     current.textContent = slideIndex;
+  //   if(s < 1) {
+  //     slideIndex = slides.length
+  //   }
+  //   slides.forEach(item => item.style.cssText = 'display: none')
+  //   slides[slideIndex - 1].style.display = 'block'
+  //   if(slides.length < 10) {
+  //     current.textContent = `0${slideIndex}`
+  //   }else{
+  //     current.textContent = slideIndex
   //   }
   // }
-  // function addSlider() {
-  //   show((slideIndex += 1));
+  // function sliderPlus(s) {
+  //   show(slideIndex += 1)
   // }
-  // function prefSlider() {
-  //   show((slideIndex = slideIndex - 1));
-  // }
-  // prev.addEventListener("click", () => {
-  //   prefSlider();
-  //   if (slideIndex === 0) {
-  //     slideIndex = total;
-  //   }
-  // });
-  // next.addEventListener("click", () => {
-  //   addSlider();
-  // });
+  // prev.addEventListener('click', () => {
+  //   sliderPlus(-1)
+  // })
+  // next.addEventListener('click', () => {
+  //   sliderPlus(1)
+  // })
 
-  //----------second way
   const slides = document.querySelectorAll(".offer__slide"),
     slider = document.querySelector(".offer__slider"),
     prev = document.querySelector(".offer__slider-prev"),
     next = document.querySelector(".offer__slider-next"),
     current = document.querySelector("#current"),
     total = document.querySelector("#total"),
-    slideWrapper = document.querySelector(".offer__slider-wrapper"),
-    width = window.getComputedStyle(slideWrapper).width,
-    slideField = document.querySelector(".offer__slider-way");
+    slidesWrapper = document.querySelector(".offer__slider-wrapper"),
+    width = window.getComputedStyle(slidesWrapper).width,
+    slidesField = document.querySelector(".offer__slider-inner");
 
   let slideIndex = 1,
     offset = 0;
@@ -269,18 +264,17 @@ window.addEventListener("DOMContentLoaded", () => {
     current.textContent = slideIndex;
   }
 
-  const cssField = slideField.style;
-  cssField.width = 100 * slides.length + `%`;
-  cssField.display = "flex";
-  cssField.transition = "0.5s all";
-  slideWrapper.style.overflow = "hidden";
+  slidesField.style.width = 100 * slides.length + "%";
+
+  slidesField.style.display = "flex";
+  slidesField.style.transition = "0.5s all";
+  slidesWrapper.style.overflow = "hidden";
 
   slides.forEach((slide) => {
     slide.style.width = width;
   });
 
   slider.style.position = "relative";
-
   let indicator = document.createElement("ol"),
     dots = [];
 
@@ -292,30 +286,29 @@ window.addEventListener("DOMContentLoaded", () => {
     z-index: 15;
     display: flex;
     justify-content: center;
-    margin-left: 15%;
     margin-right: 15%;
-    list-style: none;
-    `;
+    margin-left: 15%;
+    list-style: none
+  `;
 
   slider.append(indicator);
 
   for (let i = 0; i < slides.length; i++) {
     const dot = document.createElement("li");
-    dot.setAttribute("date-slide-to", i + 1);
+    dot.setAttribute("data-slide-to", i + 1);
     dot.style.cssText = `
-    box-sizing: content-box;
-    flex: 0 1 auto;
-    width: 30px;
-    height: 6px;
-    margin: 0 3px;
-    cursor: pointer;
-    background-color: #fff;
-    background-clip: padding-box;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    opacity: .5;
-    trasnform: opacity .6s easy;
-
+      box-sizing: content-box;
+      flex: 0 1 auto;
+      width: 30px;
+      height: 6px;
+      margin: 0 3px;
+      cursor: pointer;
+      background-color: #fff;
+      background-clip: padding-box;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      opacity: .5;
+      transform: opacity .6s ease;
     `;
     if (i == 0) {
       dot.style.opacity = 1;
@@ -326,17 +319,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
   next.addEventListener("click", () => {
     if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+      // 650
       offset = 0;
     } else {
       offset += +width.slice(0, width.length - 2);
     }
-    slideField.style.transform = `translateX(-${offset}px)`;
+    slidesField.style.transform = `translateX(-${offset}px)`;
 
     if (slideIndex == slides.length) {
       slideIndex = 1;
     } else {
       slideIndex++;
     }
+
     if (slides.length < 10) {
       current.textContent = `0${slideIndex}`;
     } else {
@@ -349,11 +344,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   prev.addEventListener("click", () => {
     if (offset == 0) {
-      offset == +width.slice(0, width.length - 2) * (slides.length - 1);
+      offset = +width.slice(0, width.length - 2) * (slides.length - 1);
     } else {
       offset -= +width.slice(0, width.length - 2);
     }
-    slideField.style.transform = `translateX(-${offset}px)`;
+    slidesField.style.transform = `translateX(-${offset}px)`;
 
     if (slideIndex == 1) {
       slideIndex = slides.length;
@@ -366,17 +361,18 @@ window.addEventListener("DOMContentLoaded", () => {
     } else {
       current.textContent = slideIndex;
     }
+
     dots.forEach((dot) => (dot.style.opacity = ".5"));
     dots[slideIndex - 1].style.opacity = 1;
   });
 
   dots.forEach((dot) => {
     dot.addEventListener("click", (e) => {
-      const slideTo = e.target.getAttribute("date-slide-to");
+      const slideTo = e.target.getAttribute("data-slide-to");
 
       slideIndex = slideTo;
-      offset == +width.slice(0, width.length - 2) * (slideTo - 1);
-      slideField.style.transform = `translateX(-${offset}px)`;
+      offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+      slidesField.style.transform = `translateX(-${offset}px)`;
 
       if (slides.length < 10) {
         current.textContent = `0${slideIndex}`;
@@ -389,3 +385,5 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// ``
